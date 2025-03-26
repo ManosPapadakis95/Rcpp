@@ -171,6 +171,24 @@ namespace attributes {
     const char * const kParamBlockStart = "{;";
     const char * const kParamBlockEnd = "}";
 
+    class DeclarationSpecifier {
+    public:
+        // Static array of declaration specifiers
+        static const char* decl_specs[];
+    
+        // Constructor initializes the name of the specifier
+        DeclarationSpecifier() {}
+        DeclarationSpecifier(std::string& func_signature);
+
+        bool empty() const { return name().empty(); }
+        std::string name() const { return name_; }
+    
+    private:
+        std::string name_;  // Store the name of the specifier
+    };
+
+    const char* DeclarationSpecifier::decl_specs[] = { "template", "inline" };
+
     // Type info
     class Type {
     public:
@@ -1039,6 +1057,21 @@ namespace attributes {
 
     } // anonymous namespace
 
+    DeclarationSpecifier::DeclarationSpecifier(std::string& func_signature){
+        const size_t n = sizeof(DeclarationSpecifier::decl_specs) / sizeof(DeclarationSpecifier::decl_specs[0]);
+        // check if the name is a declaration specifier
+        // Iterate through the array of declaration specifiers
+        for (size_t i = 0; i < n; ++i) {
+            size_t pos = func_signature.find(DeclarationSpecifier::decl_specs[i]);
+            if (pos != std::string::npos) { // Find the first declaration specifier and stop
+                name_ = DeclarationSpecifier::decl_specs[i];  // Save the matching declaration specifier
+                func_signature.erase(pos, name_.length());  // Erase the found specifier from func_signature
+                trimWhitespaceStart(&func_signature); // Remove any spaces at start
+                break;
+            }
+        }
+
+    }
 
     // Generate a type signature for the function with the provided name
     // (type signature == function pointer declaration)
