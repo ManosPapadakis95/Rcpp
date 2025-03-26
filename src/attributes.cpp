@@ -158,6 +158,7 @@ namespace attributes {
     const char * const kExportRng = "rng";
     const char * const kExportInvisible = "invisible";
     const char * const kExportSignature = "signature";
+    const char * const kExportCppName = "cpp_name";
     const char * const kInitAttribute = "init";
     const char * const kDependsAttribute = "depends";
     const char * const kPluginsAttribute = "plugins";
@@ -416,6 +417,15 @@ namespace attributes {
         }
 
         const std::vector<std::string>& roxygen() const { return roxygen_; }
+
+        std::string wrapperName() const {
+            Param wrapperNameParam = paramNamed(kExportCppName);
+            if (!wrapperNameParam.empty()){ 	// #nocov
+                return wrapperNameParam.value();
+            }
+            return function().name();
+        }
+
 
         std::string customRSignature() const {
             Param sigParam = paramNamed(kExportSignature);
@@ -1431,7 +1441,8 @@ namespace attributes {
                          (name != kExportName) &&
                          (name != kExportRng) &&
                          (name != kExportInvisible) &&
-                         (name != kExportSignature)) {
+                         (name != kExportSignature) &&
+                         (name != kExportCppName)) {
                     rcppExportWarning("Unrecognized parameter '" + name + "'",
                                       lineNumber);
                 }
