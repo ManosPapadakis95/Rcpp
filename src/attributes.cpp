@@ -1565,6 +1565,8 @@ namespace attributes {
             return Function();						// #nocov
         }
 
+        DeclarationSpecifier declaration_specifier = DeclarationSpecifier(signature);
+
         // Start at the end and look for the () that deliniates the arguments
         // (bail with an empty result if we can't find them)
         std::string::size_type endParenLoc = signature.find_last_of(')');
@@ -1680,7 +1682,7 @@ namespace attributes {
             arguments.push_back(Argument(name, type, defaultValue));
         }
 
-        return Function(type, name, arguments);
+        return Function(type, name, arguments, declaration_specifier);
     }
 
 
