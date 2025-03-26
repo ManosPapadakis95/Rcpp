@@ -269,17 +269,18 @@ namespace attributes {
         Function() {}
         Function(const Type& type,
                  const std::string& name,
-                 const std::vector<Argument>& arguments)
-            : type_(type), name_(name), arguments_(arguments)
+                 const std::vector<Argument>& arguments, DeclarationSpecifier declaration_specifier)
+            : type_(type), name_(name), arguments_(arguments), declaration_specifier_(declaration_specifier)
         {
         }
 
         Function renamedTo(const std::string& name) const {	// #nocov start
-            return Function(type(), name, arguments());
+            return Function(type(), name, arguments(), declSpec());
         }
 
         std::string signature() const { return signature(name()); }
         std::string signature(const std::string& name) const;
+        std::string signatureWithDeclSpec(const std::string& name) const;
 
         bool isHidden() const {
             return name().find_first_of('.') == 0;
@@ -299,12 +300,14 @@ namespace attributes {
 
         const Type& type() const { return type_; }
         const std::string& name() const { return name_; }
+        const DeclarationSpecifier& declSpec() const { return declaration_specifier_; }
         const std::vector<Argument>& arguments() const { return arguments_; }
 
     private:
         Type type_;
         std::string name_;
         std::vector<Argument> arguments_;
+        DeclarationSpecifier declaration_specifier_;
     };
 
     // Attribute parameter (with optional value)
@@ -1100,6 +1103,15 @@ namespace attributes {
         ostr << ")";
 
         return ostr.str();						// #nocov end
+    }
+
+    
+    // Generate a type signature for the function with the provided name
+    // (type signature == function pointer declaration)
+    std::string Function::signatureWithDeclSpec(const std::string& name) const {	// #nocov start
+        std::ostringstream ostr;
+        ostr << declSpec().name() << " " << signature(name);   // #nocov end
+        return ostr.str();
     }
 
 
