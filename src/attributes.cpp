@@ -460,6 +460,7 @@ namespace attributes {
     };
 
     // Operator << for parsed types
+    std::ostream& operator<<(std::ostream& os, const DeclarationSpecifier& declSpec);
     std::ostream& operator<<(std::ostream& os, const Type& type);
     std::ostream& operator<<(std::ostream& os, const Argument& argument);
     std::ostream& operator<<(std::ostream& os, const Function& function);
@@ -1204,6 +1205,12 @@ namespace attributes {
     // Function operator <<
     std::ostream& operator<<(std::ostream& os, const Function& function) {// #nocov start
         printFunction(os, function);
+        return os;
+    }
+    
+    // DeclarationSpecifier operator <<
+    std::ostream& operator<<(std::ostream& os, const DeclarationSpecifier& declSpec) {// #nocov start
+        os << declSpec.name();
         return os;
     }
 
