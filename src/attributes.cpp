@@ -120,6 +120,9 @@ namespace attributes {
     // Trim a string
     void trimWhitespace(std::string* pStr);
 
+    // Trim at start a string
+    void trimWhitespaceStart(std::string* pStr);
+
     // Strip trailing line comments
     void stripTrailingLineComments(std::string* pStr);
 
@@ -3077,6 +3080,13 @@ namespace attributes {
     }
 
     // Trim a string
+    void trimWhitespaceStart(std::string* pStr) {
+        // trim left
+        std::string::size_type pos = pStr->find_first_not_of(kWhitespaceChars);
+        pStr->erase(0, pos);
+    }
+
+    // Trim a string
     void trimWhitespace(std::string* pStr) {
 
         // skip empty case
@@ -3088,9 +3098,8 @@ namespace attributes {
         if (pos != std::string::npos)
             pStr->erase(pos + 1);
 
-        // trim left
-        pos = pStr->find_first_not_of(kWhitespaceChars);
-        pStr->erase(0, pos);
+        trimWhitespaceStart(pStr);
+
     }
 
     // Strip balanced quotes from around a string (assumes already trimmed)
