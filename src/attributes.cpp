@@ -1183,9 +1183,11 @@ namespace attributes {
     // Print function
     void printFunction(std::ostream& os,
                        const Function& function,
-                       bool printArgDefaults = true) {
+                       bool printArgDefaults = true, bool printDeclSpecs = true) {
 
         if (!function.empty()) {
+            if(printDeclSpecs && !function.declSpec().empty())
+                os << function.declSpec() << " ";
             if (!function.type().empty()) {
                 os << function.type();
                 os << " ";
@@ -2331,7 +2333,9 @@ namespace attributes {
                 if (function.isHidden())
                     continue;
 
-                ostr() << "    inline " << function << " {"
+                ostr() << "    inline ";
+                printFunction(ostr(), function, true, false);
+                ostr() << " {"
                         << std::endl;
 
                 std::string fnType = "Ptr_" + function.name();
