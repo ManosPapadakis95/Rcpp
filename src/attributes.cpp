@@ -2126,7 +2126,7 @@ namespace attributes {
                 ostr() << registerCCallable(
                               4,
                               attr.exportedName(),
-                              attr.function().name() + kTrySuffix);
+                              attr.wrapperName() + kTrySuffix);
                 ostr() << std::endl;
             }
             ostr() << registerCCallable(4,
@@ -2145,7 +2145,7 @@ namespace attributes {
             std::vector<std::size_t> routineArgs;
             for (std::size_t i=0;i<nativeRoutines_.size(); i++) {
                 const Attribute& attr = nativeRoutines_[i];
-                routineNames.push_back(packageCppPrefix() + "_" + attr.function().name());
+                routineNames.push_back(packageCppPrefix() + "_" + attr.wrapperName());
                 routineArgs.push_back(attr.function().arguments().size());
             }
             std::string kRcppModuleBoot = "_rcpp_module_boot_";
@@ -2586,7 +2586,7 @@ namespace attributes {
                     ostr() << "'";				// #nocov
                 else
                     ostr() << "`";
-                ostr() << packageCppPrefix() << "_" << function.name();
+                ostr() << packageCppPrefix() << "_" << attribute.wrapperName();
                 if (!registration_)
                     ostr() << "', " << "PACKAGE = '" << package() << "'";  // #nocov
                 else
@@ -2940,12 +2940,14 @@ namespace attributes {
                 ostr << ";";
             }
 
+            std::string originalFuncName = attribute.wrapperName();
+
             // write the C++ callable SEXP-based function (this version
             // returns errors via "try-error")
             ostr << std::endl;
             ostr << (cppInterface ? "static" : "RcppExport");
             ostr << " SEXP ";
-            std::string funcName = contextId + "_" + function.name();
+            std::string funcName = contextId + "_" + originalFuncName;
             ostr << funcName;
             if (cppInterface)
                 ostr << kTrySuffix;				// #nocov
