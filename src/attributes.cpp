@@ -1583,28 +1583,24 @@ namespace attributes {
         // delimites the type and name
         Type type;
         std::string name;
-        const std::string preambleText = signature.substr(0, beginParenLoc);
-        for (std::string::const_reverse_iterator
-            it = preambleText.rbegin(); it != preambleText.rend(); ++it) {
-            char ch = *it;
-            if (isWhitespace(ch)) {
-                if (!name.empty()) {
-                    // we are at the break between type and name so we can also
-                    // extract the type
-                    std::string typeText;
-                    while (++it != preambleText.rend())
-                        typeText.insert(0U, 1U, *it);
-                    type = parseType(typeText);
 
-                    // break (since we now have the name and the type)
-                    break;
-                }
-                else
-                    continue;					// #nocov
-            } else {
-                name.insert(0U, 1U, ch);
+        const std::string preambleText = signature.substr(0, beginParenLoc);
+        
+        // Step 3: Extract func_name by walking backward, handling templates
+        size_t i = preambleText.length();
+        int angle_depth = 0;
+        while (i-- > 0) { //handle template arguments by counting depth
+            char c = preambleText[i];
+            if (c == '>') ++angle_depth;
+            else if (c == '<') --angle_depth;
+            
+            if (angle_depth == 0 && std::isspace(c)) {
+                ++i;
+                break;
             }
         }
+        name = preambleText.substr(i);
+        type = parseType(preambleText.substr(0, i));
 
         // If we didn't find a name then bail
         if (name.empty()) {
