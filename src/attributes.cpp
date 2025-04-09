@@ -3802,6 +3802,7 @@ BEGIN_RCPP
                 for (size_t i = 0; i<it->params().size(); ++i)	{	// #nocov
                     oss << "#include \"" << it->params()[i].name() << "\""; 
                     includes.push_back(oss.str());	// #nocov
+                    oss.str("");
                 }
             }
         }
