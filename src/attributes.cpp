@@ -159,7 +159,6 @@ namespace attributes {
     const char * const kExportInvisible = "invisible";
     const char * const kExportSignature = "signature";
     const char * const kExportCppName = "cpp_name";
-    const char * const kIncludesAttribute = "includes";
     const char * const kInitAttribute = "init";
     const char * const kDependsAttribute = "depends";
     const char * const kPluginsAttribute = "plugins";
@@ -1501,13 +1500,6 @@ namespace attributes {
 
         }
 
-        // validate includes parameter
-        else if(name ==kIncludesAttribute){
-            if (params.empty()) {					// #nocov start
-                rcppInterfacesWarning("No header files specified", lineNumber);//
-            }// #nocov end
-        }
-
         // Return attribute
         Attribute attribute = Attribute(name, params, function, roxygenBuffer_);
         roxygenBuffer_.clear();
@@ -1833,8 +1825,7 @@ namespace attributes {
                name == kInitAttribute ||
                name == kDependsAttribute ||
                name == kPluginsAttribute ||
-               name == kInterfacesAttribute ||
-               name == kIncludesAttribute;
+               name == kInterfacesAttribute;
     }
 
     // Print an attribute parsing related warning
@@ -3791,19 +3782,12 @@ BEGIN_RCPP
         // write functions
         generators.writeFunctions(attributes, verbose);
 
-        // track depends, includes
-        std::ostringstream oss;
+        // track depends
         for (SourceFileAttributesParser::const_iterator
                      it = attributes.begin(); it != attributes.end(); ++it) {
             if (it->name() == kDependsAttribute) {
                 for (size_t i = 0; i<it->params().size(); ++i)		// #nocov
                     dependsAttribs.insert(it->params()[i].name());	// #nocov
-            } else if (it->name() == kIncludesAttribute) {
-                for (size_t i = 0; i<it->params().size(); ++i)	{	// #nocov
-                    oss << "#include \"" << it->params()[i].name() << "\""; 
-                    includes.push_back(oss.str());	// #nocov
-                    oss.str("");
-                }
             }
         }
     }
