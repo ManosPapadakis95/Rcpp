@@ -1580,18 +1580,44 @@ namespace attributes {
         
         // Step 3: Extract func_name by walking backward, handling templates
         size_t i = preambleText.length();
-        int angle_depth = 0;
-        while (i-- > 0) { //handle template arguments by counting depth
-            char c = preambleText[i];
-            if (c == '>') ++angle_depth;
-            else if (c == '<') --angle_depth;
-            
-            if (angle_depth == 0 && std::isspace(c)) {
-                ++i;
-                break;
-            }
+        std::string templateArgs = "";
+        int endFunctionName = i;
+        
+        //remove spaces from left parenthesis 
+        while(i>0 && std::isspace(preambleText[i-1])){ 
+            --i;
         }
-        name = preambleText.substr(i);
+        endFunctionName = i;
+        if(endFunctionName > 0 && preambleText[endFunctionName - 1] == '>'){ //if found template arguments
+            int startTemplateArgs = i, endTemplateArgs = endFunctionName;
+            int angle_depth = 0;
+            
+            while (startTemplateArgs-- > 0) { //handle template arguments by counting depth
+                char c = preambleText[startTemplateArgs];
+                if (c == '>') ++angle_depth;
+                else if (c == '<') --angle_depth;
+                
+                if (angle_depth == 0) {
+                    break;
+                }
+            }
+            i = startTemplateArgs; //move i to the start of the template arguments
+
+            //extract the template argument
+            templateArgs = preambleText.substr(startTemplateArgs, endTemplateArgs - startTemplateArgs);
+            
+            //remove spaces from left template arguments
+            while(i>0 && std::isspace(preambleText[i-1])){
+                --i;
+            }
+            endFunctionName = i; //move end function left from the spaces
+        }
+        
+        while(i>0 && !std::isspace(preambleText[i-1])){ //move i to the start of the function name
+            --i;
+        }
+
+        name = preambleText.substr(i, endFunctionName - i) + templateArgs;
         type = parseType(preambleText.substr(0, i));
 
         // If we didn't find a name then bail
