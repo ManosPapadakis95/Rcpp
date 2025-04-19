@@ -1066,12 +1066,17 @@ namespace attributes {
     DeclarationSpecifier::DeclarationSpecifier(std::string& func_signature){
         const size_t n = sizeof(DeclarationSpecifier::decl_specs) / sizeof(DeclarationSpecifier::decl_specs[0]);
         // check if the name is a declaration specifier
+        
+        //find the first space. Before that space will be the declaration specifier or the return type.
+        size_t first_space = func_signature.find_first_of(" ");
+        //extract the value which will be the the declaration specifier or the return type.
+        std::string declSpec = func_signature.substr(0, first_space);
+        
         // Iterate through the array of declaration specifiers
         for (size_t i = 0; i < n; ++i) {
-            size_t pos = func_signature.find(DeclarationSpecifier::decl_specs[i]);
-            if (pos != std::string::npos) { // Find the first declaration specifier and stop
+            if (declSpec == DeclarationSpecifier::decl_specs[i]) { // if Found the declaration specifier then stop
                 name_ = DeclarationSpecifier::decl_specs[i];  // Save the matching declaration specifier
-                func_signature.erase(pos, name_.length());  // Erase the found specifier from func_signature
+                func_signature.erase(0, name_.length());  // Erase the found specifier from func_signature
                 trimWhitespaceStart(&func_signature); // Remove any spaces at start
                 break;
             }
